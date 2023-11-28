@@ -1,0 +1,143 @@
+    @font-face {
+        font-family: 'Impact';
+        src: url('impact.ttf') format('truetype');
+    }
+
+    #myCanvas { 
+        border: 1px solid #000; 
+        display: block;
+        margin: 0 auto;
+    }
+
+    body {
+        margin: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        background-color: #f0f0f0;
+    }
+  
+    button {
+        background-color: white;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    button:hover {
+        box-shadow: 0 2px 3px 0 rgba(0,0,0,0.2), 0 2px 3px 0 rgba(0,0,0,0.19);
+    }
+
+    .container {
+        width: 1000px;
+        height: 500px;
+        background-color: white;
+        border: 1px solid #ccc;
+        display: flex;
+    }
+  
+    .half {
+        flex: 1;
+        padding: 10px;
+    }
+
+    .rightSide {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .textRegion {
+        display: flex;
+        min-height: 50px;
+        background-color: rgb(184, 184, 184);
+        margin-top: 10px;
+        padding: 2px;
+    }
+
+    .textField {
+        flex: 3;
+        text-align: left;
+        vertical-align: text-top;
+    }
+
+    .textConfigs {
+        flex: 1;
+        padding: 5px;
+    }
+
+    .uploadContainer {
+        padding: 10px;
+    }
+
+    .fieldsContainer {
+        flex: 1;
+    }
+
+    .generateContainer {
+        padding: 10px;
+    }
+
+    .btnUploadImage {
+        width: 260px;
+        min-height: 30px;
+    }
+
+    .btnGenerate {
+        width: 140px;
+        min-height: 26px;
+        border-color: #00bff3;
+        color: #fff;
+        background-color: #00bff3;
+    }
+
+    .btnReset {
+        width: 60px;
+        min-height: 26px;
+    }
+
+    .fontColorPicker {
+        /* background-color: #000; */
+        /* border-color: #000; */
+        width: 32px;
+    }
+
+    #modalOverlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5); /* fundo escuro para o overlay */
+        justify-content: center;
+        align-items: center;
+      }
+  
+    #modalContent {
+        background: #fff;
+        padding: 20px;
+        width: 300px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    }
+  
+      /* Estilos para o botão que abre o modal */
+    #openModalButton {
+        cursor: pointer;
+        padding: 10px 10px;
+        background: #007bff;
+        color: #fff;
+        border: none;
+        width: 32px;
+        height: 32px;
+        border-radius: 4px;
+    }
+
+    .textConfig {
+        display: flex;
+        min-height: 50px;
+        background-color: rgb(184, 184, 184);
+        margin-top: 10px;
+        padding: 2px;
+    }
