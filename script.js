@@ -4,83 +4,55 @@ const ctx = canvas.getContext('2d');
 const topText = document.getElementById('topText');
 const bottomText = document.getElementById('bottomText');
 
-const finalWidth = 735;
-const finalHeight = 500;
-const baseWidth = 500;
-const baseHeight = 300;
-
-canvas.style.width = `${baseWidth}px`;
-canvas.style.height = `${baseHeight}px`;
-
-let multX = finalWidth / baseWidth;
-let multY = finalHeight / baseHeight;
+let multX;
+let multY;
 
 let dragging = false;
 let resizing = false;
 let mouseOver = false;
 let startX, startY;
-let selectedText = null;
 let selectedRect = null;
 let resizeHandleType = null;
 
 const textMinSize = 20;
 
-const perSizeX = canvas.width/100;
-const perSizeY = canvas.height/100;
-
-const topTextRect = {
-  x: perSizeX,
-  y: perSizeY,
-  width: perSizeX * 98,
-  height: perSizeY * 25,
-};
-
-const bottomTextRect = {
-  x: perSizeX,
-  y: perSizeY * 70,
-  width: perSizeX * 98,
-  height: perSizeY * 25,
-};
-
 let axisList = [];
 
-const resizeHandleSize = 8;
-const fontSize = 50;
+const resizeHandleSize = 5;
 
-let textStyles;
-let bigTextStyles
+let image;
+let selected = memesList[0];
 
 function drawText() {
-  // Draws background image
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  canvas.style.width = `${selected.sizeX}px`;
+  canvas.style.height = `${selected.sizeY}px`;
+  canvas.width = selected.sizeX;
+  canvas.height = selected.sizeY;
+
   ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
 
-  // Set text styles
-  applyTexStyle(ctx, textStyles);
-
-  write(ctx, topText.value, topTextRect.x + topTextRect.width / 2, topTextRect.y + 30); // First line text
-  write(ctx, bottomText.value, bottomTextRect.x + bottomTextRect.width / 2, bottomTextRect.y + bottomTextRect.height - 20); // Second line text
+  selected.fields.forEach(function(field) { write(ctx, field.text, field.x + field.width / 2, field.y + field.height / 2, field.style, false); });
 
   if(mouseOver) {
-    axisList = []; // Clean axis list
-
-    drawRectangle(topTextRect); // Draws retangle around upper line text
-    drawRectangle(bottomTextRect); // Draws retangle around bottommest text
+    axisList = [];
+    selected.fields.forEach(function(field) { drawRectangle(field); });
   }
 }
 
-function applyTexStyle(canvasCtx, stl) {
-    canvasCtx.font = stl.font;
-    canvasCtx.fillStyle = stl.fillStyle;
-    canvasCtx.textAlign = stl.textAlign;
-    canvasCtx.lineWidth = stl.lineWidth;
-    canvasCtx.strokeStyle = 'black';
+function write(canvasCtx, text, x, y, style, big) {
+    canvasCtx.font = `${style.italic ? 'italic' : ''} ${style.bold ? 'bold' : ''} ${style.size * (big ? multX : 1)}px ${style.name}`;
+    canvasCtx.fillStyle = style.color;
+    canvasCtx.textAlign = 'center';
     canvasCtx.textBaseline = 'middle';
-}
-
-function write(canvasCtx, text, x, y) {
     canvasCtx.fillText(text, x, y);
-    canvasCtx.strokeText(text, x, y);
+
+    if(style.stroke) {
+      canvasCtx.strokeStyle = style.strokeColor;
+      canvasCtx.lineWidth = 2 * (big ? multX : 1);
+      canvasCtx.strokeText(text, x, y);
+    }
 }
 
 function drawRectangle(rect) {
@@ -100,8 +72,6 @@ function drawRectangle(rect) {
 }
 
 function drawResizeHandles(rect) {
-  ctx.fillStyle = 'gray';
-
   // Top-left
   createAxis(rect.x - resizeHandleSize                  , rect.y - resizeHandleSize,                    'top-left',     AxisType.UP_LEFT,     'nwse-resize', rect);
 
@@ -144,35 +114,36 @@ function createAxis(rectX, rectY, axisId, axisType, axisCursor, rect) {
 
 function drawGrabber(rectX, rectY) {
   ctx.lineWidth = 0.5;
-  ctx.roundRect(rectX, rectY, resizeHandleSize * 2, resizeHandleSize * 2, 4);
+  ctx.roundRect(rectX, rectY, resizeHandleSize * 2, resizeHandleSize * 2, 2);
   ctx.stroke();
 
   ctx.strokeStyle = "black";
-  ctx.fillStyle = "rgba(255, 255, 255, .5)";
+  ctx.fillStyle = "rgba(255, 255, 255, .7)";
   ctx.beginPath();
-  ctx.roundRect(rectX, rectY, resizeHandleSize * 2, resizeHandleSize * 2, 4);
+  ctx.roundRect(rectX, rectY, resizeHandleSize * 2, resizeHandleSize * 2, 2);
   ctx.stroke();
   ctx.fill();
 }
 
-function updateCanvas(textType) {
-  if (textType === 'topText' || textType === 'bottomText') { drawText(); }
+function updateCanvas(event, index) {
+  selected.fields[index].text = event.target.value;
+
+  drawText();
 }
 
 function generateBigImage() {
     const offCanvas = document.createElement('canvas');
     const offCtx = offCanvas.getContext('2d');
 
-    offCanvas.width = baseWidth * multX;
-    offCanvas.height = baseHeight * multY;
+    offCanvas.width = selected.sizeX * multX;
+    offCanvas.height = selected.sizeY * multY;
 
     offCtx.clearRect(0, 0, offCanvas.width, offCanvas.height);
     offCtx.drawImage(image, 0, 0, offCanvas.width, offCanvas.height);
 
-    applyTexStyle(offCtx, bigTextStyles);
-
-    write(offCtx, topText.value, (topTextRect.x + topTextRect.width / 2) * multX, (topTextRect.y + 30) * multY); // First line text
-    write(offCtx, bottomText.value, (bottomTextRect.x + bottomTextRect.width / 2) * multX, (bottomTextRect.y + bottomTextRect.height - 20) * multY); // Second line text
+    selected.fields.forEach(function(field) {
+      write(offCtx, field.text, (field.x + field.width / 2) * multX, (field.y + field.height / 2)  * multY, field.style, true);
+    });
 
     const dataURL = offCanvas.toDataURL('image/jpeg'); // ou 'image/png'
 
@@ -202,18 +173,15 @@ function handleMouseDown(e) {
     return;
   }
 
-  if (isPointInsideRect(mouseX, mouseY, topTextRect)) {
-    dragging = true;
-    startX = mouseX - topTextRect.x;
-    startY = mouseY - topTextRect.y;
-    selectedText = 'topText';
-    selectedRect = topTextRect;
-  } else if (isPointInsideRect(mouseX, mouseY, bottomTextRect)) {
-    dragging = true;
-    startX = mouseX - bottomTextRect.x;
-    startY = mouseY - bottomTextRect.y;
-    selectedText = 'bottomText';
-    selectedRect = bottomTextRect;
+  for(let i = 0; i < selected.fields.length; i++) {
+      if(isPointInsideRect(mouseX, mouseY, selected.fields[i])) {
+        dragging = true;
+        startX = mouseX - selected.fields[i].x;
+        startY = mouseY - selected.fields[i].y;
+        selectedRect = selected.fields[i];
+
+        break;
+      }
   }
 }
 
@@ -333,13 +301,17 @@ function handleMouseLeft() {
 function checkMouseCursor(mouseX, mouseY) {
   let axis = checkInside(mouseX, mouseY);
 
-  if(axis != undefined) {
-    canvas.style.cursor = axis.cursor;
-  } else if(isPointInsideRect(mouseX, mouseY, topTextRect) || isPointInsideRect(mouseX, mouseY, bottomTextRect)) {
+  if(axis != undefined) { canvas.style.cursor = axis.cursor;
+  } else if(isInsideAnyRect(mouseX, mouseY)) { 
     canvas.style.cursor = 'move';
-  } else {
-    canvas.style.cursor = 'default';
-  }
+  } else { canvas.style.cursor = 'default'; }
+}
+
+function isInsideAnyRect(mouseX, mouseY) {
+    for(let i = 0; i < selected.fields.length; i++) {
+        if(isPointInsideRect(mouseX, mouseY, selected.fields[i])) { return true; }
+    }
+    return false;
 }
 
 canvas.addEventListener('mousedown',    handleMouseDown);
@@ -348,47 +320,79 @@ canvas.addEventListener('mouseup',      handleMouseUp);
 canvas.addEventListener('mouseenter',   handleMouseEnter);
 canvas.addEventListener('mouseleave',   handleMouseLeft);
 
-const image = new Image();
-image.crossOrigin = 'Anonymous';
-image.src = 'memes/buzz.jpg';
-image.onload = function() { 
-    multX = image.width / baseWidth;
-    multY = image.height / baseHeight;
+function loadMeme() {
+  image = new Image();
+  image.crossOrigin = 'Anonymous';
 
-    textStyles = {
-        font: `${fontSize}px Impact`,
-        fillStyle: 'white',
-        textAlign: 'center',
-        lineWidth: 2,
-    };
-      
-    bigTextStyles = {
-        font: `${fontSize * multX}px Impact`,
-        fillStyle: 'white',
-        textAlign: 'center',
-        lineWidth: 2 * multX
-    };
+  image.src = `memes/${selected.image}`;
 
-    drawText(); 
+  image.onload = function() {
+    multX = image.width / selected.sizeX;
+    multY = image.height / selected.sizeY;
+
+    drawText();
+    fillEditors();
+  };
+}
+
+function fillEditors() {
+  const listDiv = document.getElementById('fieldsContainer');
+
+  listDiv.innerHTML = "";
+
+  let range;
+  selected.fields.forEach(function(field, i) {
+    range = document.createRange();
+    listDiv.appendChild(range.createContextualFragment(editorField(field.text, i)));
+  });
+}
+
+function editorField(value, index) {
+  return `<div class="textRegion">
+            <textarea class="textField" oninput="updateCanvas(event, ${index})">${value}</textarea>
+            <div class="textConfigs">
+              <input class="fontColorPicker" type="color" id="upPrimaryColorPicker" name="primaryColor" value="#FFFFFF">
+              <input class="fontColorPicker" type="color" id="upStrokeColorPicker" name="strokeColor" value="#000000">
+              <button id="openModalButton"/>
+            </div>
+          </div>`;
+}
+
+function abrirModal() {
+  document.getElementById('modalOverlay').style.display = 'flex';
+}
+
+function fecharModal() {
+  document.getElementById('modalOverlay').style.display = 'none';
+}
+
+document.getElementById('modalOverlay').addEventListener('click', function(event) {
+  if (event.target === this) { fecharModal(); }
+});
+
+const AxisType = {
+  UP_LEFT: 'Up Left', UP: 'Up',
+  UP_RIGHT: 'Up Right', RIGHT: 'Right',
+  DOWN_RIGHT: 'Down Right', DOWN: 'Down',
+  DOWN_LEFT: 'Down Left', LEFT: 'Left',
 };
 
-  function abrirModal() {
-    document.getElementById('modalOverlay').style.display = 'flex';
-  }
+loadMeme();
 
-  function fecharModal() {
-    document.getElementById('modalOverlay').style.display = 'none';
-  }
+function fillMemesList() {
+  const listDiv = document.getElementById('memesList');
 
-  document.getElementById('modalOverlay').addEventListener('click', function(event) {
-    if (event.target === this) { fecharModal(); }
+  let range;
+
+  memesList.forEach(function(meme, i) {
+    range = document.createRange();
+    listDiv.appendChild(range.createContextualFragment(`<img src="memes/${meme.image}" class="thumb" onclick="memeSelected(${i})">`));
   });
+}
 
-  document.getElementById('openModalButton').addEventListener('click', abrirModal);
+fillMemesList();
 
-  const AxisType = {
-    UP_LEFT: 'Up Left', UP: 'Up',
-    UP_RIGHT: 'Up Right', RIGHT: 'Right',
-    DOWN_RIGHT: 'Down Right', DOWN: 'Down',
-    DOWN_LEFT: 'Down Left', LEFT: 'Left',
-  };
+function memeSelected(index) {
+  selected = memesList[index];
+  loadMeme();
+}

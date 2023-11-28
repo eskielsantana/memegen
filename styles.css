@@ -14,8 +14,10 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        flex-direction: column;
         height: 100vh;
         background-color: #f0f0f0;
+        overflow-y: hidden !important;
     }
   
     button {
@@ -35,6 +37,39 @@
         background-color: white;
         border: 1px solid #ccc;
         display: flex;
+    }
+
+    .memesContainer {
+        margin-top: 30px;
+        width: 1000px;
+        height: 120px;
+        display: flex;
+    }
+
+    #memesList {
+        width: 100%;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+
+    .memesList::-webkit-scrollbar {
+        height: 10px;
+    }
+  
+    .memesList::-webkit-scrollbar-thumb {
+        background: #8c00ff; 
+        border-radius: 10px;
+    }
+  
+    .memesList::-webkit-scrollbar-thumb:hover {
+        background: #6900be; 
+    }
+
+    .thumb {
+        display: inline-block;
+        margin-right: 5px;
+        cursor: pointer;
+        height: 90%;
     }
   
     .half {
@@ -59,6 +94,7 @@
         flex: 3;
         text-align: left;
         vertical-align: text-top;
+        resize: none;
     }
 
     .textConfigs {
@@ -70,7 +106,7 @@
         padding: 10px;
     }
 
-    .fieldsContainer {
+    #fieldsContainer {
         flex: 1;
     }
 

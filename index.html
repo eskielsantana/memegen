@@ -9,34 +9,21 @@
 <body>
   <div class="container">
     <div class="half">
-      <canvas id="myCanvas" width="500" height="300"></canvas>
+      <canvas id="myCanvas"></canvas>
     </div>
     <div class="half rightSide">
       <div class="uploadContainer">
         <button class="btnUploadImage"> Upload new image </button>
       </div>
-      <div class="fieldsContainer">
-        <div class="textRegion">
-          <input type="text" id="topText" class="textField" placeholder="Texto Superior" oninput="updateCanvas('topText')">
-          <div class="textConfigs">
-            <input class="fontColorPicker" type="color" id="upPrimaryColorPicker" name="primaryColor" value="#FFFFFF">
-            <input class="fontColorPicker" type="color" id="upStrokeColorPicker" name="strokeColor" value="#000000">
-            <button id="openModalButton"/>
-          </div>
-        </div>
-        <div class="textRegion">
-          <input type="text" id="bottomText" class="textField" placeholder="Texto Inferior" oninput="updateCanvas('bottomText')">
-          <div class="textConfigs">
-            <input class="fontColorPicker" type="color" id="upPrimaryColorPicker" name="primaryColor" value="#FFFFFF">
-            <input class="fontColorPicker" type="color" id="upStrokeColorPicker" name="strokeColor" value="#000000">
-          </div>
-        </div>
-      </div>
+      <div id="fieldsContainer"></div>
       <div class="generateContainer">
         <button class="btnGenerate" onclick="generateBigImage()"> Generate </button>
         <button class="btnReset"> Reset </button>
       </div>
     </div>
+  </div>
+  <div class="memesContainer">
+    <div id="memesList"></div>
   </div>
   <div id="modalOverlay">
     <div id="modalContent">
@@ -45,6 +32,7 @@
       </div>
     </div>
   </div>
+  <script defer src="collection.js"></script>
   <script defer src="script.js"></script>
 </body>
 </html>
