@@ -4,21 +4,20 @@ const ctx = canvas.getContext('2d');
 const topText = document.getElementById('topText');
 const bottomText = document.getElementById('bottomText');
 
-let multX;
-let multY;
+let multX, multY;
+let startX, startY;
 
 let dragging = false;
 let resizing = false;
 let mouseOver = false;
-let startX, startY;
 let selectedRect = null;
 let resizeHandleType = null;
 
 const textMinSize = 20;
+const lineHeight = 25;
+const resizeHandleSize = 5;
 
 let axisList = [];
-
-const resizeHandleSize = 5;
 
 let image;
 let selected = memesList[0];
@@ -42,17 +41,24 @@ function drawText() {
 }
 
 function write(canvasCtx, text, x, y, style, big) {
-    canvasCtx.font = `${style.italic ? 'italic' : ''} ${style.bold ? 'bold' : ''} ${style.size * (big ? multX : 1)}px ${style.name}`;
-    canvasCtx.fillStyle = style.color;
-    canvasCtx.textAlign = 'center';
-    canvasCtx.textBaseline = 'middle';
-    canvasCtx.fillText(text, x, y);
+  const lines = text.split('\n');
+  const baseY = y - (((lines.length - 1) * (style.lineHeight * (big ? multX : 1))) / 2);
 
-    if(style.stroke) {
-      canvasCtx.strokeStyle = style.strokeColor;
-      canvasCtx.lineWidth = 2 * (big ? multX : 1);
-      canvasCtx.strokeText(text, x, y);
-    }
+  lines.forEach((line, index) => { writeLine(canvasCtx, line, x, baseY + index * (style.lineHeight * (big ? multX : 1)), style, big); });
+}
+
+function writeLine(canvasCtx, line, x, y, style, big) {
+  canvasCtx.font = `${style.italic ? 'italic' : ''} ${style.bold ? 'bold' : ''} ${style.size * (big ? multX : 1)}px ${style.name}`;
+  canvasCtx.fillStyle = style.color;
+  canvasCtx.textAlign = 'center';
+  canvasCtx.textBaseline = 'middle';
+  canvasCtx.fillText(line, x, y);
+
+  if(style.stroke) {
+    canvasCtx.strokeStyle = style.strokeColor;
+    canvasCtx.lineWidth = style.strokeSize * (big ? multX : 1);
+    canvasCtx.strokeText(line, x, y);
+  }
 }
 
 function drawRectangle(rect) {
@@ -127,7 +133,6 @@ function drawGrabber(rectX, rectY) {
 
 function updateCanvas(event, index) {
   selected.fields[index].text = event.target.value;
-
   drawText();
 }
 
